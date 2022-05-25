@@ -20,47 +20,47 @@ D = 18; %m
 
 F = 0.4*D;
 
-%theta_rim_max = 2*atan(1/(4*F/D));
-
-%theta_rim_max = 2*pi/180; %rad
-
 theta_rim_max = pi/2;
 
-P = zeros(1,length(0:theta_rim_max/100:theta_rim_max));
+P = zeros(1,length(0:theta_rim_max/200:theta_rim_max));
 
 theta_rim = 0;
+
 k = 1;
+
+step_size = lambda/200;
+
+range_phi = (0:step_size:2*pi);
+
 %% Analysis
 while(theta_rim<=theta_rim_max)
     theta = 0;
-    range_theta = (0:0.001:theta_rim);
-    range_phi = (0:0.001:2*pi);
-    arr = zeros(1,length(range_theta).*length(range_phi));
-    bruh = zeros(1,length(range_theta).*length(range_phi));
-    f = zeros(1,length(arr));
-    n = 1;
+    n = 1;    
+    range_theta = (0:step_size:theta_rim);    
+    arr = 0;
     while(theta<=theta_rim)        
         phi =0;
+        p = 2*F*tan(theta/2);
         while(phi<=2*pi)
             term1 = (cos(theta)^q)/sqrt((cos(theta)^2)*(sin(phi)^2)+(cos(phi)^2));
             term2 = sqrt(...
                 (cos(theta)*sin(phi)*cos(theta/2))^2+...
                 (cos(phi)*cos(theta/2))^2+...
                 (cos(theta)*sin(phi)*sin(theta/2))^2);
-            p = 2*F*tan(theta/2);
             term3 = exp(1i*beta*p*sin(theta)*cos(phi));
             func = term1*term2*term3;
-            disp(abs(func))
-            arr(n) = 4*pi*sin(theta)*(0.001*0.001)*abs(func)^2;
-            phi = phi + 0.001;
+            arr = arr + (step_size^2)*func;
+            phi = phi + step_size;
             n = n + 1;
         end
-        theta = theta + 0.001;
+        theta = theta + step_size;
     end
-    P(k)=sum(arr);
+    P(k)= arr;
     k = k + 1;
-    theta_rim = theta_rim + theta_rim_max/100;
+    theta_rim = theta_rim + theta_rim_max/200;
 end
-angle_rim = (0:theta_rim_max/100:theta_rim_max);
-D_dBi = 10*log10(4.*pi./P);
-figure;plot(angle_rim*180/pi,D_dBi);
+
+%% Plotting
+angle_rim = (0:theta_rim_max/200:theta_rim_max);
+D_dBi = 10*log10(4*pi./(4*pi*(abs(P).^2)));
+figure;plot(angle_rim*180/pi,D_dBi);hold all;
