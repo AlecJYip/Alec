@@ -22,7 +22,7 @@ F = 0.4*D;
 
 theta_rim_max = pi/2;
 
-%theta_rim_max = 2*pi/180;
+theta_rim_max = 2*pi/180;
 
 P = zeros(1,length(0:theta_rim_max/200:theta_rim_max));
 
@@ -68,4 +68,4 @@ end
 %% Plotting
 angle_rim = (0:theta_rim_max/200:theta_rim_max);
 D_dBi = 10*log10(4*pi./(4*pi*(abs(P).^2)));
-figure;plot(angle_rim*180/pi,D_dBi);hold all;xlabel('\theta');ylabel('Directivity [dBi]');title('Figure 3');grid on;
+figure;plot(angle_rim*180/pi,D_dBi);hold all;xlabel('\theta [deg]');ylabel('Directivity [dBi]');title('Figure 3');grid on;
