@@ -22,7 +22,7 @@ F = 0.4*D;
 
 theta_rim_max = pi/2;
 
-theta_rim_max = 2*pi/180;
+%theta_rim_max = 2*pi/180;
 
 P = zeros(1,length(0:theta_rim_max/200:theta_rim_max));
 
@@ -52,8 +52,8 @@ while(theta_rim<=theta_rim_max)
                 (cos(phi)*cos(theta/2))^2+...
                 (cos(theta)*sin(phi)*sin(theta/2))^2));
             term3 = exp(1i*beta*p*sin(theta)*cos(phi));
-            %term3 = exp(-1i*beta*zf);
-            func = term1*term2*term3;
+            term4 = exp(-1i*2*beta*F);
+            func = term1*term2*term3*term4;
             arr = arr + (step_size^2)*func;
             phi = phi + step_size;
             n = n + 1;
