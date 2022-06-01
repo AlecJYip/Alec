@@ -60,8 +60,8 @@ while(theta_rim<=theta_rim_max)
             J = 2*cross(n_hat, H_over_I);
             
             mag_J = magnitude(J);
-            
-            func = mag_J*exp(1i*beta*tan(pi/2-theta));
+                       
+            func = abs(mag_J*exp(1i*beta*tan(pi/2-theta)));
             
             arr = arr + (step_size^2)*func;
             phi = phi + step_size;
@@ -88,7 +88,7 @@ function J = magnitude(Q)
     sum_1 = zeros(1, length(Q));
     while(n<=length(Q))
         
-        sum_1(n) = abs(Q(n)^2);
+        sum_1(n) = abs(Q(n))^2;
         n = n + 1;
         
     end
