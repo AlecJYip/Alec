@@ -20,11 +20,11 @@ D = 18; %m
 
 F = 0.4*D;
 
-theta_rim_max = pi/2;
+%theta_rim_max = pi/2;
 
-theta_rim_max = pi/4;
+%theta_rim_max = pi/4;
 
-%theta_rim_max = 2*pi/180;
+theta_rim_max = 2*pi/180;
 
 P = zeros(1,length(0:theta_rim_max/200:theta_rim_max));
 
@@ -48,14 +48,21 @@ while(theta_rim<=theta_rim_max)
         rf = F*(sec(theta/2)^2);
         zf = sqrt(p^2-rf^2);
         while(phi<=2*pi)
-            term1 = (cos(theta)^q)/sqrt((cos(theta)^2)*(sin(phi)^2)+(cos(phi)^2));
-            term2 = sqrt(abs(...
-                (cos(theta)*sin(phi)*cos(theta/2))^2+...
-                (cos(phi)*cos(theta/2))^2+...
-                (cos(theta)*sin(phi)*sin(theta/2))^2));
-            term3 = exp(1i*beta*tan(pi/2-theta));
-            term4 = exp(-1i*beta*rf);
-            func = term1*term2*term3*term4;
+            
+            y_hat = [sin(theta)*cos(phi) cos(theta)*cos(phi) -sin(theta)];
+            
+            s_i_hat = [1 0 0];
+            
+            H_over_I  = (cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))*exp(-1i*beta*rf)*(cos(theta)^q);
+            
+            n_hat = [-cos(theta/2) sin(theta/2) 0];
+            
+            J = 2*cross(n_hat, H_over_I);
+            
+            mag_J = magnitude(J);
+            
+            func = mag_J*exp(1i*beta*tan(pi/2-theta));
+            
             arr = arr + (step_size^2)*func;
             phi = phi + step_size;
             n = n + 1;
@@ -72,3 +79,19 @@ angle_rim = (0:theta_rim_max/200:theta_rim_max);
 D_dBi = 10*log10(4*pi./(4*pi*(abs(P).^2)));
 figure;plot(angle_rim*180/pi,D_dBi);hold all;xlabel('\theta [deg]');
 ylabel('Directivity [dBi]');title('Figure 3');grid on;
+
+%% Functions
+
+function J = magnitude(Q) 
+
+    n = 1;
+    sum_1 = zeros(1, length(Q));
+    while(n<=length(Q))
+        
+        sum_1(n) = abs(Q(n)^2);
+        n = n + 1;
+        
+    end
+    
+    J = sum(sum_1);
+end
