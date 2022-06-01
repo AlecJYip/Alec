@@ -20,13 +20,23 @@ D = 18; %m
 
 F = 0.4*D;
 
+e = 8.85e-12;
+
+mu = (4*pi)*(10^-7);
+
+eta = sqrt(mu/e);
+
+w = 2*pi*f;
+
 %theta_rim_max = pi/2;
 
 %theta_rim_max = pi/4;
 
 theta_rim_max = 2*pi/180;
 
-P = zeros(1,length(0:theta_rim_max/200:theta_rim_max));
+E_i = zeros(1,length(0:theta_rim_max/200:theta_rim_max));
+
+E_f = zeros(1,length(0:theta_rim_max/200:theta_rim_max));
 
 theta_rim = 0;
 
@@ -61,22 +71,25 @@ while(theta_rim<=theta_rim_max)
             
             mag_J = magnitude(J);
                        
-            func = abs(mag_J*exp(1i*beta*tan(pi/2-theta)));
+            func = w*mu*(1/(4*pi))*abs(mag_J*exp(1i*beta*tan(pi/2-theta)));
             
             arr = arr + (step_size^2)*func;
             phi = phi + step_size;
+            
+            E_f(n) = magnitude(abs(-eta*H_over_I));
+            
             n = n + 1;
         end
         theta = theta + step_size;
     end
-    P(k)= arr;
+    E_i(k)= arr;
     k = k + 1;
     theta_rim = theta_rim + theta_rim_max/200;
 end
 
 %% Plotting
 angle_rim = (0:theta_rim_max/200:theta_rim_max);
-D_dBi = 10*log10(4*pi./(4*pi*(abs(P).^2)));
+D_dBi = 20*log10(E_i/max(E_f));
 figure;plot(angle_rim*180/pi,D_dBi);hold all;xlabel('\theta [deg]');
 ylabel('Directivity [dBi]');title('Figure 3');grid on;
 
