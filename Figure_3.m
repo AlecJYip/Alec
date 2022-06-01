@@ -28,21 +28,15 @@ eta = sqrt(mu/e);
 
 w = 2*pi*f;
 
-%theta_rim_max = pi/2;
-
-%theta_rim_max = pi/4;
-
 theta_rim_max = 2*pi/180;
 
 E_i = zeros(1,length(0:theta_rim_max/200:theta_rim_max));
-
-E_f = zeros(1,length(0:theta_rim_max/200:theta_rim_max));
 
 theta_rim = 0;
 
 k = 1;
 
-step_size = lambda/500;
+step_size = lambda/200;
 
 range_phi = (0:step_size:2*pi);
 
@@ -54,9 +48,7 @@ while(theta_rim<=theta_rim_max)
     arr = 0;
     while(theta<=theta_rim)        
         phi = 0;
-        p = 2*F*tan(theta/2);
         rf = F*(sec(theta/2)^2);
-        zf = sqrt(p^2-rf^2);
         while(phi<=2*pi)
             
             y_hat = [sin(theta)*cos(phi) cos(theta)*cos(phi) -sin(theta)];
@@ -69,20 +61,17 @@ while(theta_rim<=theta_rim_max)
             
             J = 2*cross(n_hat, H_over_I);
             
-            mag_J = magnitude(J);
-                       
-            func = w*mu*(1/(4*pi))*abs(mag_J*exp(1i*beta*tan(pi/2-theta)));
+            func = 1i*w*mu*(1/(4*pi))*J*exp(1i*beta*tan(pi/2-theta));
             
             arr = arr + (step_size^2)*func;
+            
             phi = phi + step_size;
-            
-            E_f(n) = magnitude(abs(-eta*H_over_I));
-            
+                        
             n = n + 1;
         end
         theta = theta + step_size;
     end
-    E_i(k)= arr;
+    E_i(k)= magnitude(arr);
     k = k + 1;
     theta_rim = theta_rim + theta_rim_max/200;
 end
