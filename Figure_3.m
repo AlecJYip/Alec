@@ -42,7 +42,7 @@ theta_rim = 0;
 
 k = 1;
 
-step_size = lambda/200;
+step_size = lambda/500;
 
 range_phi = (0:step_size:2*pi);
 
@@ -87,9 +87,12 @@ while(theta_rim<=theta_rim_max)
     theta_rim = theta_rim + theta_rim_max/200;
 end
 
+magnitude_E =  eta*magnitude((cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat))));
+
+
 %% Plotting
 angle_rim = (0:theta_rim_max/200:theta_rim_max);
-D_dBi = 20*log10(E_i/max(E_f));
+D_dBi = 20*log10(E_i/magnitude_E);
 figure;plot(angle_rim*180/pi,D_dBi);hold all;xlabel('\theta [deg]');
 ylabel('Directivity [dBi]');title('Figure 3');grid on;
 
