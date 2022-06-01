@@ -30,7 +30,9 @@ w = 2*pi*f;
 
 theta_rim_max = 2*pi/180;
 
-E_i = zeros(1,length(0:theta_rim_max/200:theta_rim_max));
+rim_step_size = theta_rim_max/200;
+
+E_i = zeros(1,length(0:rim_step_size:theta_rim_max));
 
 theta_rim = 0;
 
@@ -55,7 +57,7 @@ while(theta_rim<=theta_rim_max)
             
             s_i_hat = [1 0 0];
             
-            H_over_I  = (cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))*exp(-1i*beta*rf)*(cos(theta)^q);
+            H_over_I  = (1/rf)*(cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))*exp(-1i*beta*rf)*(cos(theta)^q);
             
             n_hat = [-cos(theta/2) sin(theta/2) 0];
             
@@ -73,14 +75,14 @@ while(theta_rim<=theta_rim_max)
     end
     E_i(k)= magnitude(arr);
     k = k + 1;
-    theta_rim = theta_rim + theta_rim_max/200;
+    theta_rim = theta_rim + rim_step_size;
 end
 
-magnitude_E =  eta*magnitude((cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat))));
+magnitude_E =  eta/F;
 
 
 %% Plotting
-angle_rim = (0:theta_rim_max/200:theta_rim_max);
+angle_rim = (0:rim_step_size:theta_rim_max);
 D_dBi = 20*log10(E_i/magnitude_E);
 figure;plot(angle_rim*180/pi,D_dBi);hold all;xlabel('\theta [deg]');
 ylabel('Directivity [dBi]');title('Figure 3');grid on;
