@@ -64,7 +64,7 @@ while(theta_rim<=theta_rim_max)
             
             J = 2*cross(n_hat, H_over_I);
             
-            func = 1i*(1/(4*pi))*w*mu*J*exp(1i*beta*tan(theta));
+            func = 1i*(1/(4*pi))*w*mu*J*exp(1i*beta*tan(pi/2-theta));
             
             arr = arr + (step_size^2)*magnitude(func);
                         
