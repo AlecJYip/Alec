@@ -57,13 +57,14 @@ while(theta_rim<=theta_rim_max)
             
             s_i_hat = [1 0 0];
             
-            H_over_I  = (cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))*exp(-1i*beta*rf)*(cos(theta)^q);
+            H_over_I  = (1/rf)*(cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))...
+                *exp(-1i*beta*rf)*(cos(theta)^q);
             
             n_hat = [-cos(theta/2) sin(theta/2) 0];
             
             J = 2*cross(n_hat, H_over_I);
             
-            func = 1i*w*mu*J*exp(1i*beta*tan(pi/2-theta));
+            func = 1i*(1/(4*pi))*w*mu*J*exp(1i*beta*tan(pi/2-theta));
             
             arr = arr + (step_size^2)*magnitude(func);
                         
@@ -93,7 +94,9 @@ while(theta<=pi)
                 
         H_over_I  = (cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))*exp(-1i*beta*rf)*(cos(theta)^q);
                 
-        arr2 = arr2 + (step_size^2)*sin(theta)*(1/(2*eta))*(eta*magnitude(H_over_I))^2;
+        E = eta*magnitude(H_over_I);
+        
+        arr2 = arr2 + sin(theta)*(1/(2*eta))*((step_size^2)*abs(eta*magnitude(H_over_I)))^2;
         
         phi = phi + step_size;
         
@@ -112,7 +115,6 @@ figure;plot(angle_rim*180/pi,D_dBi);hold all;xlabel('\theta [deg]');
 ylabel('Directivity [dBi]');title('Figure 3');grid on;
 
 %% Functions
-
 function J = magnitude(Q) 
     n = 1;
     sum_1 = zeros(1, length(Q));
