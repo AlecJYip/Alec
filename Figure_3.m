@@ -50,21 +50,21 @@ while(theta_rim<=theta_rim_max)
     arr = 0;
     while(theta<=theta_rim)        
         phi = 0;
-        rf = F*(sec(theta/2)^2);
+        s_i = F*(sec(theta/2)^2);
         while(phi<=2*pi)
             
             y_hat = [sin(theta)*cos(phi) cos(theta)*cos(phi) -sin(theta)];
             
             s_i_hat = [1 0 0];
             
-            H_over_I  = (1/rf)*(cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))...
-                *exp(-1i*beta*rf)*(cos(theta)^q);
+            H_over_I  = (1/s_i)*(cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))...
+                *exp(-1i*beta*s_i)*(cos(theta)^q);
             
             n_hat = [-cos(theta/2) sin(theta/2) 0];
             
             J = 2*cross(n_hat, H_over_I);
             
-            func = 1i*(1/(4*pi))*w*mu*J*exp(1i*beta*tan(pi/2-theta));
+            func = 1i*(1/(4*pi))*w*mu*J*exp(1i*beta*tan(theta));
             
             arr = arr + (step_size^2)*magnitude(func);
                         
@@ -87,16 +87,16 @@ arr2 = 0;
 
 while(theta<=pi)
     phi = 0;
-    rf = F*(sec(theta/2)^2);
+    s_i = F*(sec(theta/2)^2);
     while(phi<=2*pi)
         
         y_hat = [sin(theta)*cos(phi) cos(theta)*cos(phi) -sin(theta)];
                 
-        H_over_I  = (cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))*exp(-1i*beta*rf)*(cos(theta)^q);
+        H_over_I  = (1/s_i)*(cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))*exp(-1i*beta*s_i)*(cos(theta)^q);
                 
         E = eta*magnitude(H_over_I);
         
-        arr2 = arr2 + sin(theta)*(1/(2*eta))*((step_size^2)*abs(eta*magnitude(H_over_I)))^2;
+        arr2 = arr2 + (step_size^2)*sin(theta)*(1/(2*eta))*(abs(E))^2;
         
         phi = phi + step_size;
         
