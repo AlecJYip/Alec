@@ -32,7 +32,7 @@ theta_rim_max = 2*pi/180;
 
 rim_step_size = theta_rim_max/200;
 
-E_i = zeros(1,length(0:rim_step_size:theta_rim_max));
+power_density = zeros(1,length(0:rim_step_size:theta_rim_max));
 
 theta_rim = 0;
 
@@ -63,9 +63,9 @@ while(theta_rim<=theta_rim_max)
             
             J = 2*cross(n_hat, H_over_I);
             
-            func = 1i*w*mu*(1/(4*pi))*J*exp(1i*beta*tan(pi/2-theta));
+            func = 1i*w*mu*J*exp(1i*beta*tan(pi/2-theta));
             
-            arr = arr + (step_size^2)*magnitude(func)^2;
+            arr = arr + (step_size^2)*magnitude(func);
                         
             phi = phi + step_size;
                         
@@ -73,7 +73,7 @@ while(theta_rim<=theta_rim_max)
         end
         theta = theta + step_size;
     end
-    E_i(k)= magnitude(arr);
+    power_density(k)= (1/(2*eta))*(arr^2);
     k = k + 1;
     theta_rim = theta_rim + rim_step_size;
 end
@@ -90,9 +90,7 @@ while(theta<=pi)
     while(phi<=2*pi)
         
         y_hat = [sin(theta)*cos(phi) cos(theta)*cos(phi) -sin(theta)];
-        
-        s_i_hat = [1 0 0];
-        
+                
         H_over_I  = (cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))*exp(-1i*beta*rf)*(cos(theta)^q);
                 
         arr2 = arr2 + (step_size^2)*sin(theta)*(1/(2*eta))*(eta*magnitude(H_over_I))^2;
@@ -104,27 +102,23 @@ while(theta<=pi)
     theta = theta + step_size;
 end
 
-avg_power_density =  arr2/(4*pi);
+avg_power_density =  arr2;
 
 
 %% Plotting
 angle_rim = (0:rim_step_size:theta_rim_max);
-D_dBi = 10*log10(E_i/avg_power_density);
+D_dBi = 10*log10(power_density/avg_power_density);
 figure;plot(angle_rim*180/pi,D_dBi);hold all;xlabel('\theta [deg]');
 ylabel('Directivity [dBi]');title('Figure 3');grid on;
 
 %% Functions
 
 function J = magnitude(Q) 
-
     n = 1;
     sum_1 = zeros(1, length(Q));
-    while(n<=length(Q))
-        
+    while(n<=length(Q))        
         sum_1(n) = abs(Q(n))^2;
-        n = n + 1;
-        
-    end
-    
+        n = n + 1;        
+    end    
     J = sum(sum_1);
 end
