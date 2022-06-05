@@ -30,11 +30,13 @@ w = 2*pi*f;
 
 theta_rim_max = 2*pi/180;
 
+%theta_rim_max = 2*atan(1/(4*F/D));
+
 rim_step_size = theta_rim_max/200;
 
 power_density = zeros(1,length(0:rim_step_size:theta_rim_max));
 
-theta_rim = 0;
+theta_rim = theta_rim_max;
 
 k = 1;
 
@@ -45,7 +47,7 @@ range_phi = (0:step_size:2*pi);
 s_i_hat = [1 0 0];
 
 %% Analysis: Numerator
-while(theta_rim<=theta_rim_max)
+while(theta_rim>=0)
     theta = 0;
     n = 1;    
     arr = [0 0 0];
@@ -77,16 +79,16 @@ while(theta_rim<=theta_rim_max)
         end
         theta = theta + step_size;
     end
-    power_density(k)= (1/(2*eta))*(magnitude(arr)^2);
+    power_density(k)= (1/(2*eta))*(abs(magnitude(arr))^2);
     k = k + 1;
-    theta_rim = theta_rim + rim_step_size;
+    theta_rim = theta_rim - rim_step_size;
 end
 
 %% Analysis: Denominator
 
 theta = 0;
 
-arr2 = zeros(1, length(0:step_size:pi)*length(0:step_size:2*pi));
+arr2 = 0;
 
 q = 1;
 
@@ -102,18 +104,17 @@ while(theta<=pi)
         
         E = -eta*(H_over_I);
         
-        arr2(q) =  (1/(2*eta))*magnitude(E)^2;
+        arr2 = arr2+ (step_size^2)*sin(theta)*(1/(2*eta))*magnitude(E)^2;
         
         phi = phi + step_size;
         
         n = n + 1;
         
-        q = 1 + 1;
     end
     theta = theta + step_size;
 end
 
-avg_power_density =  magnitude(arr2);
+avg_power_density =  arr2/(4*pi);
 
 
 %% Plotting
