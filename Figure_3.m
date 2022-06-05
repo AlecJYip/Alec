@@ -86,7 +86,9 @@ end
 
 theta = 0;
 
-arr2 = 0;
+arr2 = zeros(1, length(0:step_size:pi)*length(0:step_size:2*pi));
+
+q = 1;
 
 while(theta<=pi)
     phi = 0;
@@ -100,11 +102,13 @@ while(theta<=pi)
         
         E = -eta*(H_over_I);
         
-        arr2 = arr2 + (step_size^2)*sin(theta)*(1/(2*eta))*magnitude(E)^2;
+        arr2(q) =  (1/(2*eta))*magnitude(E)^2;
         
         phi = phi + step_size;
         
         n = n + 1;
+        
+        q = 1 + 1;
     end
     theta = theta + step_size;
 end
@@ -114,7 +118,7 @@ avg_power_density =  magnitude(arr2);
 
 %% Plotting
 angle_rim = (0:rim_step_size:theta_rim_max);
-D_dBi = 10*log10(power_density/avg_power_density);
+D_dBi = 10*log10(power_density./avg_power_density);
 figure;plot(angle_rim*180/pi,D_dBi);hold all;xlabel('\theta [deg]');
 ylabel('Directivity [dBi]');title('Figure 3');grid on;
 
