@@ -42,11 +42,13 @@ step_size = lambda/200;
 
 range_phi = (0:step_size:2*pi);
 
+s_i_hat = [1 0 0];
+
 %% Analysis: Numerator
 while(theta_rim<=theta_rim_max)
     theta = 0;
     n = 1;    
-    arr = 0;
+    arr = [0 0 0];
     while(theta<=theta_rim)        
         phi = 0;
         s_i = F*(sec(theta/2)^2);
@@ -56,9 +58,7 @@ while(theta_rim<=theta_rim_max)
         while(phi<=2*pi)
             
             y_hat = [sin(theta)*cos(phi) cos(theta)*cos(phi) -sin(theta)];
-            
-            s_i_hat = [1 0 0];
-            
+                       
             H_over_I  = (1/s_i)*(cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))...
                 *exp(-1i*beta*s_i)*(cos(theta)^q);
             
@@ -69,7 +69,7 @@ while(theta_rim<=theta_rim_max)
             func = 1i*(1/(4*pi))*w*mu*J...
                 *exp(1i*beta*far_field_dist);
             
-            arr = arr + (step_size^2)*magnitude(func);
+            arr = arr + (step_size^2)*(func);
                         
             phi = phi + step_size;
                         
@@ -77,7 +77,7 @@ while(theta_rim<=theta_rim_max)
         end
         theta = theta + step_size;
     end
-    power_density(k)= (1/(2*eta))*(arr^2);
+    power_density(k)= (1/(2*eta))*(magnitude(arr)^2);
     k = k + 1;
     theta_rim = theta_rim + rim_step_size;
 end
@@ -86,7 +86,7 @@ end
 
 theta = 0;
 
-arr2 = 0;
+arr2 = [0 0 0];
 
 while(theta<=pi)
     phi = 0;
@@ -97,9 +97,9 @@ while(theta<=pi)
                 
         H_over_I  = (1/s_i)*(cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))*exp(-1i*beta*s_i)*(cos(theta)^q);
                 
-        E = eta*magnitude(H_over_I);
+        E = eta*(H_over_I);
         
-        arr2 = arr2 + (step_size^2)*sin(theta)*(1/(2*eta))*(abs(E))^2;
+        arr2 = arr2 + (step_size^2)*sin(theta)*(1/(2*eta))*(magnitude(E)).^2;
         
         phi = phi + step_size;
         
@@ -108,7 +108,7 @@ while(theta<=pi)
     theta = theta + step_size;
 end
 
-avg_power_density =  arr2;
+avg_power_density =  magnitude(arr2);
 
 
 %% Plotting
@@ -125,5 +125,5 @@ function J = magnitude(Q)
         sum_1(n) = abs(Q(n))^2;
         n = n + 1;        
     end    
-    J = sum(sum_1);
+    J = sqrt(sum(sum_1));
 end
