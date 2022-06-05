@@ -86,7 +86,7 @@ end
 
 theta = 0;
 
-arr2 = [0 0 0];
+arr2 = 0;
 
 while(theta<=pi)
     phi = 0;
@@ -95,11 +95,12 @@ while(theta<=pi)
         
         y_hat = [sin(theta)*cos(phi) cos(theta)*cos(phi) -sin(theta)];
                 
-        H_over_I  = (1/s_i)*(cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))*exp(-1i*beta*s_i)*(cos(theta)^q);
-                
-        E = eta*(H_over_I);
+        H_over_I  = (1/s_i)*(cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))...
+            *exp(-1i*beta*s_i)*(cos(theta)^q);
         
-        arr2 = arr2 + (step_size^2)*sin(theta)*(1/(2*eta))*(magnitude(E)).^2;
+        E = -eta*(H_over_I);
+        
+        arr2 = arr2 + (step_size^2)*sin(theta)*(1/(2*eta))*magnitude(E)^2;
         
         phi = phi + step_size;
         
