@@ -32,7 +32,7 @@ w = 2*pi*f;
 
 theta_rim_max = 2*atan(1/(4*F/D));
 
-rim_step_size = theta_rim_max/200;
+rim_step_size = lambda/1000;
 
 power_density = zeros(1,length(0:rim_step_size:theta_rim_max));
 
@@ -40,7 +40,7 @@ theta_rim = 0;
 
 k = 1;
 
-step_size = lambda/200;
+step_size = 0.3*lambda;
 
 range_phi = (0:step_size:2*pi);
 
@@ -72,7 +72,7 @@ while(theta_rim<=theta_rim_max)
             func = 1i*(1/(4*pi))*w*mu*J...
                 *exp(1i*beta*far_field_dist)*1;
             
-            arr = arr + (step_size^2)*(func);
+            arr = arr + (step_size^2)*(func)*s_i;
                         
             phi = phi + step_size;
                         
