@@ -48,16 +48,17 @@ s_i_hat = [1 0 0];
 
 %% Analysis: Numerator
 while(theta_rim>=0)
-    theta = 0;
+    theta = theta_rim;
     n = 1;    
     arr = [0 0 0];
-    while(theta<=theta_rim)        
-        phi = 0;
+    while(theta>=0)        
+        phi = 2*pi;
         s_i = F*(sec(theta/2)^2);
         p_prime = 2*F*tan(theta/2);
+        p_phi_prime = 2*F*tan(phi/4);
         far_field_dist = sqrt(s_i^2-p_prime^2);
         
-        while(phi<=2*pi)
+        while(phi>=0)
             
             y_hat = [sin(theta)*cos(phi) cos(theta)*cos(phi) -sin(theta)];
                        
@@ -69,15 +70,15 @@ while(theta_rim>=0)
             J = 2*cross(n_hat, H_over_I);
             
             func = 1i*(1/(4*pi))*w*mu*J...
-                *exp(1i*beta*far_field_dist);
+                *exp(1i*beta*far_field_dist)*1;
             
             arr = arr + (step_size^2)*(func);
                         
-            phi = phi + step_size;
+            phi = phi - step_size;
                         
             n = n + 1;
         end
-        theta = theta + step_size;
+        theta = theta - step_size;
     end
     power_density(k)= (1/(2*eta))*(abs(magnitude(arr))^2);
     k = k + 1;
@@ -92,7 +93,7 @@ arr2 = 0;
 
 q = 1;
 
-while(theta<=pi)
+while(theta<=pi/2)
     phi = 0;
     s_i = F*(sec(theta/2)^2);
     while(phi<=2*pi)
