@@ -28,15 +28,15 @@ eta = sqrt(mu/e);
 
 w = 2*pi*f;
 
-theta_rim_max = 2*pi/180;
+%theta_rim_max = 2*pi/180;
 
-%theta_rim_max = 2*atan(1/(4*F/D));
+theta_rim_max = 2*atan(1/(4*F/D));
 
 rim_step_size = theta_rim_max/200;
 
 power_density = zeros(1,length(0:rim_step_size:theta_rim_max));
 
-theta_rim = theta_rim_max;
+theta_rim = 0;
 
 k = 1;
 
@@ -47,18 +47,18 @@ range_phi = (0:step_size:2*pi);
 s_i_hat = [1 0 0];
 
 %% Analysis: Numerator
-while(theta_rim>=0)
+while(theta_rim<=theta_rim_max)
     theta = theta_rim;
     n = 1;    
     arr = [0 0 0];
-    while(theta>=0)        
-        phi = 2*pi;
+    while(theta<=theta_rim_max)        
+        phi = 0;
         s_i = F*(sec(theta/2)^2);
         p_prime = 2*F*tan(theta/2);
         p_phi_prime = 2*F*tan(phi/4);
         far_field_dist = sqrt(s_i^2-p_prime^2);
         
-        while(phi>=0)
+        while(phi<=2*pi)
             
             y_hat = [sin(theta)*cos(phi) cos(theta)*cos(phi) -sin(theta)];
                        
@@ -74,15 +74,15 @@ while(theta_rim>=0)
             
             arr = arr + (step_size^2)*(func);
                         
-            phi = phi - step_size;
+            phi = phi + step_size;
                         
             n = n + 1;
         end
-        theta = theta - step_size;
+        theta = theta + step_size;
     end
     power_density(k)= (1/(2*eta))*(abs(magnitude(arr))^2);
     k = k + 1;
-    theta_rim = theta_rim - rim_step_size;
+    theta_rim = theta_rim + rim_step_size;
 end
 
 %% Analysis: Denominator
