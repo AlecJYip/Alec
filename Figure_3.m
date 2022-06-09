@@ -34,29 +34,29 @@ theta_rim_max = 2*atan(1/(4*F/D));
 
 rim_step_size = lambda/1000;
 
-power_density = zeros(1,length(0:rim_step_size:theta_rim_max));
+E = zeros(1,length(0:rim_step_size:theta_rim_max));
 
 theta_rim = 0;
 
 k = 1;
 
-step_size = 0.3*lambda;
+step_size = 0.01*lambda;
 
 range_phi = (0:step_size:2*pi);
 
 s_i_hat = [1 0 0];
 
 %% Analysis: Numerator
+
 while(theta_rim<=theta_rim_max)
     theta = theta_rim;
     n = 1;    
     arr = [0 0 0];
     while(theta<=theta_rim_max)        
+        
         phi = 0;
         s_i = F*(sec(theta/2)^2);
-        p_prime = 2*F*tan(theta/2);
-        p_phi_prime = 2*F*tan(phi/4);
-        far_field_dist = sqrt(s_i^2-p_prime^2);
+        far_field_dist = F-s_i*cos(theta);
         
         while(phi<=2*pi)
             
@@ -64,15 +64,15 @@ while(theta_rim<=theta_rim_max)
                        
             H_over_I  = (1/s_i)*(cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))...
                 *exp(-1i*beta*s_i)*(cos(theta)^q);
-            
+                        
             n_hat = [-cos(theta/2) sin(theta/2) 0];
             
             J = 2*cross(n_hat, H_over_I);
             
-            func = 1i*(1/(4*pi))*w*mu*J...
-                *exp(1i*beta*far_field_dist)*1;
+            func = -1i*(1/(4*pi))*w*mu*J...
+                *exp(1i*beta*far_field_dist);
             
-            arr = arr + (step_size^2)*(func)*s_i;
+            arr = arr + (step_size^2)*func*sin(theta);
                         
             phi = phi + step_size;
                         
@@ -80,10 +80,12 @@ while(theta_rim<=theta_rim_max)
         end
         theta = theta + step_size;
     end
-    power_density(k)= (1/(2*eta))*(abs(magnitude(arr))^2);
+    E(k)= (abs(magnitude(arr))^2);
     k = k + 1;
     theta_rim = theta_rim + rim_step_size;
 end
+
+figure;plot(E);
 
 %% Analysis: Denominator
 
@@ -91,37 +93,25 @@ theta = 0;
 
 arr2 = 0;
 
-q = 1;
-
-while(theta<=pi/2)
-    phi = 0;
-    s_i = F*(sec(theta/2)^2);
-    while(phi<=2*pi)
-        
-        y_hat = [sin(theta)*cos(phi) cos(theta)*cos(phi) -sin(theta)];
-                
-        H_over_I  = (1/s_i)*(cross(y_hat, s_i_hat)/magnitude(cross(y_hat, s_i_hat)))...
-            *exp(-1i*beta*s_i)*(cos(theta)^q);
-        
-        E = -eta*(H_over_I);
-        
-        arr2 = arr2+ (step_size^2)*sin(theta)*(1/(2*eta))*magnitude(E)^2;
-        
-        phi = phi + step_size;
-        
-        n = n + 1;
-        
-    end
+while(theta <= pi/2)
+    
+    arr2 = arr2 + (cos(theta)^(2*q))*sin(theta)*step_size;    
+    
     theta = theta + step_size;
+    
 end
 
-avg_power_density =  arr2/(4*pi);
+denominator_term_1 = arr2*2*pi/(4*pi)^2;
+
+denominator_term_2 = (abs(1/s_i^2))/((4*pi)^2);
+
+denominator = denominator_term_1*denominator_term_2;
 
 
 %% Plotting
 angle_rim = (0:rim_step_size:theta_rim_max);
-D_dBi = 10*log10(power_density./avg_power_density);
-figure;plot(angle_rim*180/pi,D_dBi);hold all;xlabel('\theta [deg]');
+D_dBi = 10*log10(E./denominator);
+%figure;plot(angle_rim*180/pi,D_dBi);hold all;xlabel('\theta [deg]');xlim([0 2]);
 ylabel('Directivity [dBi]');title('Figure 3');grid on;
 
 %% Functions
