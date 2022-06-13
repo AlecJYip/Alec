@@ -28,9 +28,11 @@ eta = sqrt(mu/e);
 
 w = 2*pi*f;
 
-theta_rim_max = 2*pi/180;
+%theta_rim_max = 2*pi/180;
 
-%theta_rim_max = 2*atan(1/(4*F/D));
+theta_rim_max = 2*atan(1/(4*F/D));
+
+%theta_rim_max = 90*pi/180;
 
 rim_step_size = lambda/1000;
 
@@ -40,7 +42,7 @@ theta_rim = 0;
 
 k = 1;
 
-step_size = 0.005*lambda;
+step_size = 0.3*lambda;
 
 range_phi = (0:step_size:2*pi);
 
@@ -51,13 +53,12 @@ s_i_hat = [1 0 0];
 while(theta_rim<=theta_rim_max)
     theta = theta_rim;
     n = 1;    
-    %arr = [0 0 0];
-    arr = 0;
+    arr = [0 0 0];
     while(theta<=theta_rim_max)        
         
         phi = 0;
         s_i = F*(sec(theta/2)^2);
-        far_field_dist = F-s_i*cos(theta);
+        far_field_dist = s_i*cos(theta);
         
         while(phi<=2*pi)
             
@@ -72,7 +73,7 @@ while(theta_rim<=theta_rim_max)
             
             func = J*exp(1i*beta*far_field_dist);
             
-            arr = arr + (step_size^2)*(func);
+            arr = arr + (step_size^2)*func*sin(theta)*s_i^2;
                         
             phi = phi + step_size;
                         
@@ -80,13 +81,10 @@ while(theta_rim<=theta_rim_max)
         end
         theta = theta + step_size;
     end
-    %numerator(k)= (abs(magnitude(arr))^2);
-    numerator(k)= (abs(magnitude(arr))^2);
+    numerator(k)= abs(magnitude(arr))^2;
     k = k + 1;
     theta_rim = theta_rim + rim_step_size;
 end
-
-%figure;plot(10*log10(numerator));
 
 %% Analysis: Denominator
 
