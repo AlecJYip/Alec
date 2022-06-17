@@ -1,0 +1,142 @@
+%% Title Block
+
+%Purpose of code: To determine the E field magnitude from a differential
+%patch on the reflector.
+
+clc;
+clear;
+close all;
+
+%% Variables
+                      %SE all the extra blank lines make this harder to read
+f = 1.5e9; %Hz
+
+c = 3e8; %m/s
+
+lambda = c/f; %m
+
+beta = 2*pi/lambda; %rad/m
+
+q = 1.14;
+
+D = 18; %m
+
+F = 0.4*D; %m
+
+e = 8.85e-12; %F/m %SE dangerous to use "e" for "epsilon"
+
+mu = (4*pi)*(10^-7); %H/m
+
+eta = sqrt(mu/e); %ohms
+
+w = 2*pi*f; %rad/m  %SE dangerous to use "w" for "omega"
+
+rim_angle = 2*atan(1/(4*F/D)); %rad
+
+p_step_size = lambda/10;  %SE dangerous to use "p" for "rho"
+
+angular_step_size = (pi/180)/10;   %SE Does this yield patch edge length about 0.3 wavelengths?
+
+feed_point = [0 0 F]; %location of the feed in cartisean coordinates
+
+y_hat = [0 1 0]; %unit vector in cartisean coordinates
+
+%% Analysis: Numerator
+
+rho = 0; %m, projection onto the Z axis 
+
+theta = 0; %observing the scattered E field from the vertex of the parabola
+
+while(rho<=D/2) %iterating from p = 0 to p = D/2
+        
+    arr = [0 0 0];  %E field array
+    
+    phi = 0;
+    
+    s_i = F*(sec(theta/2)^2); %m, distance from feed to the reflector 
+    
+    z = s_i*cos(theta); %m,  %SE simpler/faster to compute z directly from rho. Simpler math, easier to follow.
+    
+    while(phi<=2*pi)     
+        
+        r_p = [rho*cos(phi) rho*sin(phi) z]; %point on the reflector  
+
+        s_i_vec = r_p - feed_point; %vector s^i in the paper
+        
+        s_i_hat = s_i_vec/norm(s_i_vec); 
+        
+        differential_surface_area = rho*sqrt(4*F^2+rho^2)/(2*F)*...
+            angular_step_size*p_step_size; %m, 16-165 in Stutzman
+
+        H_over_I  =  1i*(1/s_i)*(cross(y_hat, s_i_hat)/norm(cross(y_hat, s_i_hat)))...
+            *exp(-1i*beta*s_i)*(cos(theta)^q); %A/m, Equation 2 in AWPL
+        
+        x = rho;
+        
+        y = s_i*sin(phi);
+        
+        r_f_hat = [x y z]/sqrt(x^2+y^2+z^2);
+        
+        theta_hat = [x*z y*z -(x^2+y^2)]/(sqrt(x^2+y^2+z^2)*sqrt(x^2+y^2));
+        
+        n_hat = -cos(theta/2)*r_f_hat + sin(theta/2)*theta_hat;
+
+        J = 2*cross(n_hat, H_over_I); %A/m, equivalent surface current density
+        
+        r_hat = [sin(theta)*cos(phi) sin(theta)*sin(phi) cos(theta)]; %vector from feed to far-field point
+            
+        field_dist = abs(dot(r_hat, s_i_vec));%m, dot product in Equation 1 in AWPL
+        %SE This is actually r_hat dot r' where r' is the vector from the origin to the point on the reflector.
+
+        integrand = J*w*mu*(1/(4*pi))*...
+            exp(1i*beta*field_dist)*...
+            differential_surface_area;
+        arr = arr + integrand;
+        
+        phi = phi + angular_step_size;
+        
+    end
+    rho = rho + p_step_size;
+end
+
+E_field_mag = norm(arr)
+
+%% Analysis: Denominator
+
+%Used in the gain pattern for recreating figure 3
+
+theta = 0;
+
+arr2 = 0;
+
+while(theta <= pi/2)
+    
+    arr2 = arr2 + (cos(theta)^(2*q))*sin(theta)*angular_step_size;
+    
+    theta = theta + angular_step_size;
+    
+end
+
+denominator_term_1 = 2*pi*arr2;
+
+denominator_term_2 = (eta^2)/((4*pi)^3);
+
+denominator = denominator_term_1*denominator_term_2;
+
+disp('Done')
+
+
+%% Plotting
+
+% angle_rim = (0:rim_step_size:theta_rim_max);
+
+% D_dBi = 10*log10(numerator./denominator);
+
+% figure;plot(angle_rim*180/pi,D_dBi);hold all;xlabel('\theta [deg]');xlim([0 2]);
+
+% ylabel('Directivity [dBi]');title('Figure 3');grid on;
+
+%SE frustrating to get to here to find out "magnitude()" is something you defined.  This should have been disclosed at the beginning or on first use.
+
+
+%% Functions
