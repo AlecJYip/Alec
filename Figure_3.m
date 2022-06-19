@@ -20,7 +20,7 @@ epsilon = 8.85e-12; %F/m
 mu = (4*pi)*(10^-7); %H/m
 eta = sqrt(mu/epsilon); %ohms
 omega = 2*pi*f; %rad/m 
-rim_angle = 2*atan(1/(4*F/D)); %rad
+%rim_angle = 2*atan(1/(4*F/D)); %rad
 rim_angle = 2*pi/180;
 rho_step_size = lambda/10;
 angular_step_size = (pi/180)/10;
@@ -49,9 +49,13 @@ while(theta <= rim_angle)
         
         while(phi<=2*pi)
             
-            r_p = [s_i*sin(phi/2) s_i*sin(theta) F-z]; %point on the reflector
+            %r_p = [sqrt(4*F*z) sqrt(4*F*z) z];
             
-            %r_p = [ rho*cos(phi) rho*sin(phi) z ];            
+            %point on the reflector
+            
+            %r_p = [s_i*cos(phi/2)*sin(theta) s_i*sin(phi/2)*sin(theta) F-z];          
+            
+            r_p = [rho*cos(pi/2-phi) rho*sin(pi/2-phi) F-z]; %point on the reflector  
             
             s_i_vec = r_p - feed_point; %vector s^i in the paper    
             
